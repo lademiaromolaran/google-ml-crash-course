@@ -1,0 +1,12 @@
+Board Size:
+19
+Player vs AI:
+0
+Player Starts White:
+0
+Komi:
+0
+Valid Placement HighLight Color:
+255 255 0
+Invalid Placement HighLight Color:
+255 0 0
