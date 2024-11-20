@@ -60,8 +60,8 @@ void playMatch(SDL_Plotter& g, Settings& s) //WIP
     Player pB(ST_BLACK), pW(ST_WHITE);
 
     //Link setterStone to settings' colors
-    setterStone.setBlackPlayerColor(&s.blackStone);
-    setterStone.setWhitePlayerColor(&s.whiteStone);
+    setterStone.setPlayerBlackColor(&s.blackStone);
+    setterStone.setPlayerWhiteColor(&s.whiteStone);
     setterStone.setType(stoneType);
 
     //Initialize Board

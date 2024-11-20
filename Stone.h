@@ -18,8 +18,8 @@ class Stone
 private:
     color _color;
     StoneType type;
-    color* whitePlayer;
-    color* blackPlayer;
+    color* playerWhite;
+    color* playerBlack;
 public:
 
     /*
@@ -42,9 +42,27 @@ public:
     */
     void setType(StoneType type);
 
-    void setWhitePlayerColor(color* wPlayer);
+    /*
+    *   @function: setPlayerWhiteColor()
+    *   @description: Sets the color for player white to point to the
+                      parameter. Used for connecting white stone color
+                      to settings.
+    *   @pre-condition: Object exists
+    *   @post-condition: playerWhite updated
+    *   @return: nothing
+    */
+    void setPlayerWhiteColor(color* wPlayer);
 
-    void setBlackPlayerColor(color* bPlayer);
+    /*
+    *   @function: setPlayerBlackColor()
+    *   @description: Sets the color for player black to point to the
+                      parameter. Used for connecting black stone color
+                      to settings.
+    *   @pre-condition: Object exists
+    *   @post-condition: playerBlack updated
+    *   @return: nothing
+    */
+    void setPlayerBlackColor(color* bPlayer);
 
     /*
     *   @function: getType()

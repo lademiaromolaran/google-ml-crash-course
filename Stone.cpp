@@ -2,8 +2,8 @@
 
 Stone::Stone(StoneType type)
 {
-    whitePlayer = nullptr;
-    blackPlayer = nullptr;
+    playerWhite = nullptr;
+    playerBlack = nullptr;
     setType(type);
 }
 
@@ -12,24 +12,24 @@ void Stone::setType(StoneType type)
     this->type = type;
     switch(this->type)
     {
-        case ST_BLACK: if(blackPlayer != nullptr) _color = *blackPlayer;
+        case ST_BLACK: if(playerBlack != nullptr) _color = *playerBlack;
                        else _color = C_BLACK;
                     break;
-        case ST_WHITE: if(whitePlayer != nullptr) _color = *whitePlayer;
+        case ST_WHITE: if(playerWhite != nullptr) _color = *playerWhite;
                        else _color = C_WHITE;
                     break;
         default: _color = color(128, 128, 128);
     }
 }
 
-void Stone::setWhitePlayerColor(color* wPlayer)
+void Stone::setPlayerWhiteColor(color* wPlayer)
 {
-    whitePlayer = wPlayer;
+    playerWhite = wPlayer;
 }
 
-void Stone::setBlackPlayerColor(color* bPlayer)
+void Stone::setPlayerBlackColor(color* bPlayer)
 {
-    blackPlayer = bPlayer;
+    playerBlack = bPlayer;
 }
 
 StoneType Stone::getType() const
