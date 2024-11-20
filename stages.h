@@ -4,7 +4,7 @@
 * File Description: This file contains functions for the
                     different stages of the application.
 * Date Created: 11/12/2024
-* Date Last Modified: 11/13/2024
+* Date Last Modified: 11/19/2024
 */
 
 #ifndef STAGES_H
@@ -15,6 +15,7 @@
 #include "match_helpers.h"
 #include "helpers.h"
 #include "config.h"
+#include "Player.h"
 
 /*
 *   @function: mainMenu()
@@ -31,20 +32,19 @@ Stage mainMenu(SDL_Plotter& g); //WIP
 *   @description: Allows the user to set the different
                   options for the match.
 *   @pre-condition: None
-*   @post-condition: "settings.txt" updated with new options
+*   @post-condition: Settings updated with new options
 *   @return: nothing
 */
-void options(SDL_Plotter& g); //WIP
+void options(SDL_Plotter& g, Settings& s); //WIP
 
 /*
 *   @function: playMatch()
 *   @description: Runs the match and handles all aspects of the game
                   such as the board, stone placement, and scoring.
-*   @pre-condition: "settings.txt" exists and is configured
-                    based on createSettingsFile()
+*   @pre-condition: None
 *   @post-condition: Plotter updated
 *   @return: nothing
 */
-void playMatch(SDL_Plotter& g); //WIP
+void playMatch(SDL_Plotter& g, Settings& s); //WIP
 
 #endif

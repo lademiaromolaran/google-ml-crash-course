@@ -9,7 +9,7 @@
 * Assignment Description: Write an application that runs the game of Go
 * Due Date: 12/08/2024
 * Date Created: 11/12/2024
-* Date Last Modified: 11/13/2024
+* Date Last Modified: 11/19/2024
 */
 
 #include <iostream>
@@ -24,8 +24,7 @@ int main(int argc, char ** argv)
 {
     SDL_Plotter g(SCREEN_X, SCREEN_Y);
     Stage stage;
-
-    createSettingsFile();
+    Settings settings;
 
     try
     {
@@ -35,14 +34,18 @@ int main(int argc, char ** argv)
 
             if(stage == S_OPTIONS)
             {
-                options(g);
+                options(g, settings);
             }
 
             if(stage == S_PLAY)
             {
-                playMatch(g);
+                playMatch(g, settings);
             }
         } while(stage != S_QUIT);
+    }
+    catch(GoGameException& e)
+    {
+        cout << "Error: " << e.what() << endl;
     }
     catch(...)
     {

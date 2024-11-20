@@ -3,7 +3,7 @@
 * File Name: Stone.h
 * File Description: This file contains the Stone class
 * Date Created: 11/13/2024
-* Date Last Modified: 11/13/2024
+* Date Last Modified: 11/19/2024
 */
 
 #ifndef STONE_H
@@ -18,6 +18,8 @@ class Stone
 private:
     color _color;
     StoneType type;
+    color* whitePlayer;
+    color* blackPlayer;
 public:
 
     /*
@@ -39,6 +41,10 @@ public:
     *   @return: nothing
     */
     void setType(StoneType type);
+
+    void setWhitePlayerColor(color* wPlayer);
+
+    void setBlackPlayerColor(color* bPlayer);
 
     /*
     *   @function: getType()
