@@ -25,17 +25,9 @@ Stage mainMenu(SDL_Plotter& g) //WIP
 }
 
 
-void options(SDL_Plotter& g) //WIP
+void options(SDL_Plotter& g, Settings& s) //WIP
 {
     bool exitOptions = false;
-
-    //Settings Data Abstraction
-    int boardSize          = BOARD_SIZE;
-    bool isPvAI            = IS_PvAI;
-    bool isPlayerWhite     = IS_PLAYER_WHITE;
-    double komi            = KOMI;
-    color validHighlight   = VALID_HIGHLIGHT;
-    color invalidHighlight = INVALID_HIGHLIGHT;
 
     /*
     -Needs Options Screen Rendering
@@ -51,52 +43,37 @@ void options(SDL_Plotter& g) //WIP
 
         g.update();
     }
-
-    //Update settings file after options selection
-    createSettingsFile(boardSize,
-                       isPvAI,
-                       isPlayerWhite,
-                       komi,
-                       validHighlight,
-                       invalidHighlight);
 }
 
-void playMatch(SDL_Plotter& g) //WIP
+void playMatch(SDL_Plotter& g, Settings& s) //WIP
 {
-    //Settings Data Abstraction
-    int boardSize;
-    bool isPvAI;
-    bool isPlayerWhite;
-    double komi;
-    color validHighlight;
-    color invalidHighlight;
-
-    extractSettings(boardSize,
-                    isPvAI,
-                    isPlayerWhite,
-                    komi,
-                    validHighlight,
-                    invalidHighlight);
-
     //Game Data Abstraction
-    Point** board = new Point*[boardSize];
+    Point** board = new Point*[s.boardSize];
     point offset(0,0);
-    int pointLength = (SCREEN_X - offset.x*2) / boardSize;
+    int pointLength = (SCREEN_X - offset.x*2) / s.boardSize;
     point mouse, hover, center;
     Coordinate mCoord, hCoord;
-    StoneType stone = ST_BLACK;
+    StoneType stoneType = ST_BLACK;
+    Stone setterStone;
     color highlight;
 
+    Player pB(ST_BLACK), pW(ST_WHITE);
+
+    //Link setterStone to settings' colors
+    setterStone.setPlayerBlackColor(&s.blackStone);
+    setterStone.setPlayerWhiteColor(&s.whiteStone);
+    setterStone.setType(stoneType);
+
     //Initialize Board
-    for(int r = 0; r < boardSize; r++)
+    for(int r = 0; r < s.boardSize; r++)
     {
-        board[r] = new Point[boardSize];
+        board[r] = new Point[s.boardSize];
     }
 
     //Map to neighbors
-    for(int r = 0; r < boardSize; r++)
+    for(int r = 0; r < s.boardSize; r++)
     {
-        for(int c = 0; c < boardSize; c++)
+        for(int c = 0; c < s.boardSize; c++)
         {
             board[r][c].setRow(r);
             board[r][c].setCol(c);
@@ -105,7 +82,7 @@ void playMatch(SDL_Plotter& g) //WIP
             {
                 board[r][c].setLiberty(board[r-1] + c, UP);
             }
-            if(r < boardSize-1)
+            if(r < s.boardSize-1)
             {
                 board[r][c].setLiberty(board[r+1] + c, DOWN);
             }
@@ -113,7 +90,7 @@ void playMatch(SDL_Plotter& g) //WIP
             {
                 board[r][c].setLiberty(board[r] + c-1, LEFT);
             }
-            if(c < boardSize-1)
+            if(c < s.boardSize-1)
             {
                 board[r][c].setLiberty(board[r] + c+1, RIGHT);
             }
@@ -121,55 +98,76 @@ void playMatch(SDL_Plotter& g) //WIP
     }
 
     //Render Board
-    drawBoard(g, board, boardSize, pointLength, offset);
+    drawBoard(g, board, s.boardSize, pointLength, offset);
 
+
+    //Start Timer
+    pB.startTimer();
 
     while(!g.getQuit())
     {
+
         //Hover Stone
         g.getMouseLocation(hover.x, hover.y);
         hCoord = pointToCoord(hover, pointLength, offset);
 
-        if(coordInBounds(hCoord, boardSize))
+        if(coordInBounds(hCoord, s.boardSize))
         {
-            if(isPlaceable(board, hover, pointLength, boardSize, offset))
+            if(isPlaceable(board, hover, pointLength, s.boardSize, offset))
             {
-                highlight = validHighlight;
+                highlight = s.validHighlight;
             }
             else
             {
-                highlight = invalidHighlight;
+                highlight = s.invalidHighlight;
             }
             center.x = offset.x + hCoord.col*pointLength + pointLength/2;
             center.y = offset.y + hCoord.row*pointLength + pointLength/2;
 
             drawHover(g, center, pointLength,
-                      Stone(stone).getColor(), highlight);
+                      setterStone.getColor(), highlight);
         }
 
-
+        //Mouse Click
         if(g.mouseClick())
         {
             mouse = g.getMouseClick();
-            if(isPlaceable(board, mouse, pointLength, boardSize, offset))
+            if(isPlaceable(board, mouse, pointLength, s.boardSize, offset))
             {
                 mCoord = pointToCoord(mouse, pointLength, offset);
-                board[mCoord.row][mCoord.col].setStone(Stone(stone));
-                stone = static_cast<StoneType>((stone + 1) % 2);
+                board[mCoord.row][mCoord.col].setStone(setterStone);
+                stoneType = static_cast<StoneType>((stoneType + 1) % 2);
+                setterStone.setType(stoneType);
                 board[mCoord.row][mCoord.col].drawPoint(g, pointLength, offset);
+
+                //Player updates
+                if(stoneType == pB.getStoneType())
+                {
+                    pB.startTimer();
+                    pW.pauseTimer();
+
+                    pW.addStones(1);
+                }
+                else
+                {
+                    pW.startTimer();
+                    pB.pauseTimer();
+
+                    pB.addStones(1);
+                }
             }
 
         }
         g.update();
 
         //Clear Hover
-        if(coordInBounds(hCoord, boardSize))
+        if(coordInBounds(hCoord, s.boardSize))
         {
             board[hCoord.row][hCoord.col].drawPoint(g, pointLength, offset);
         }
     }
 
-    for(int r = 0; r < boardSize; r++)
+    for(int r = 0; r < s.boardSize; r++)
     {
         delete[] board[r];
     }

@@ -3,7 +3,7 @@
 * File Name: Stone.h
 * File Description: This file contains the Stone class
 * Date Created: 11/13/2024
-* Date Last Modified: 11/13/2024
+* Date Last Modified: 11/19/2024
 */
 
 #ifndef STONE_H
@@ -18,6 +18,8 @@ class Stone
 private:
     color _color;
     StoneType type;
+    color* playerWhite;
+    color* playerBlack;
 public:
 
     /*
@@ -39,6 +41,28 @@ public:
     *   @return: nothing
     */
     void setType(StoneType type);
+
+    /*
+    *   @function: setPlayerWhiteColor()
+    *   @description: Sets the color for player white to point to the
+                      parameter. Used for connecting white stone color
+                      to settings.
+    *   @pre-condition: Object exists
+    *   @post-condition: playerWhite updated
+    *   @return: nothing
+    */
+    void setPlayerWhiteColor(color* wPlayer);
+
+    /*
+    *   @function: setPlayerBlackColor()
+    *   @description: Sets the color for player black to point to the
+                      parameter. Used for connecting black stone color
+                      to settings.
+    *   @pre-condition: Object exists
+    *   @post-condition: playerBlack updated
+    *   @return: nothing
+    */
+    void setPlayerBlackColor(color* bPlayer);
 
     /*
     *   @function: getType()

@@ -8,10 +8,3 @@ Here are a few things to know when developing:
 
 3. Each branch name should reflect the task on linear.
 Ex: Linear task(GO-123) "Test Function" would have "feature/go-123-test-function" as its branch name
-
-_____________________________________________________________________________
-
-Settings.txt
--Default version is created at the start of the application
--Options stage modifies it using the createSettingsFile() in helpers.h
--playMatch() in stages.h extracts the information
