@@ -1,10 +1,10 @@
 /*
-* Author: Aidan Stout
+* Author: Aidan Stout, Ryan Limprecht
 * File Name: match_helpers.h
 * File Description: This file contains functions that help
                     the playMatch stage specifically in stages.h
 * Date Created: 11/13/2024
-* Date Last Modified: 11/13/2024
+* Date Last Modified: 11/30/2024
 */
 
 #ifndef MATCH_HELPERS_H
@@ -13,6 +13,7 @@
 #include "SDL_Plotter.h"
 #include "Point.h"
 #include "helpers.h"
+#include "Player.h"
 
 struct Coordinate
 {
@@ -72,4 +73,32 @@ bool coordInBounds(Coordinate c, int boardSize);
 *   @return: nothing
 */
 void drawHover(SDL_Plotter& g, point center, int pointLength, color stone, color highlight);
+
+/*
+*   @function: isStringSurrounded()
+*   @description: Revursively checks whether a string of same type stones is capturable
+*   @pre-condition: none
+*   @post-condition: true if string can be captured, false if not
+*   @return: bool
+*/
+bool isStringSurrounded(Point** &board, Point &p);
+
+/*
+*   @function: captureStones()
+*   @description: Captures all capturable stones
+*   @pre-condition: none
+*   @post-condition: All capturable stones are removed from the board
+*   @return: none
+*/
+void captureStones(Point** &board, int size, SDL_Plotter& g, int pointLength, point offset, Player& pB, Player& pW);
+
+/*
+*   @function: unMarkStones()
+*   @description: Unmarks all marked stones
+*   @pre-condition: none
+*   @post-condition: All marks will be cleared
+*   @return: none
+*/
+void unMarkStones(Point** &board, int size);
+
 #endif

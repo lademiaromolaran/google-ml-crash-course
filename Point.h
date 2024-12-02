@@ -1,9 +1,9 @@
 /*
-* Author: Aidan Stout
+* Author: Aidan Stout, Ryan Limprecht
 * File Name: Point.h
 * File Description: This file contains the Point class
 * Date Created: 11/12/2024
-* Date Last Modified: 11/13/2024
+* Date Last Modified: 11/30/2024
 */
 
 #ifndef POINT_H
@@ -20,6 +20,8 @@ private:
     int row;
     int col;
     Stone stone;
+    bool marked;
+    bool territory;
 
     //List of the 4 neighboring Points, if border then nullptr
     Point** liberties;
@@ -129,6 +131,15 @@ public:
     *   @return: copy of stone type
     */
     StoneType getStoneType() const;
+    
+    /*
+	*   @function: getLiberty()
+	*   @description: returns a pointer to an adjacent point
+	*   @pre-condition: Object exists
+	*   @post-condition: Object unchanged
+	*   @return: copy of adjacent Point pointer
+	*/
+	Point* getLiberty(Direction d) const;
 
     /*
     *   @function: drawPoint()
@@ -139,6 +150,73 @@ public:
     *   @return: nothing
     */
     void drawPoint(SDL_Plotter& g, int pointLength, point offset=point(0,0));
+    
+    /*
+	*   @function: erasePoint()
+	*   @description: Plots the background
+	*   @pre-condition: Object exists
+	*   @post-condition: Object unchanged, SDL_Plotter updated
+	*   @return: nothing
+	*/
+	void erasePoint(SDL_Plotter& g, int pointLength, point offset=point(0,0));
+    
+	/*
+	*   @function: isMarked()
+	*   @description: returns marked as a bool
+	*   @pre-condition: Object exists
+	*   @post-condition: Object unchanged
+	*   @return: bool
+	*/
+	bool isMarked() const;
+	
+	/*
+	*   @function: setMarked()
+	*   @description: updates Marked bool
+	*   @pre-condition: Object exists
+	*   @post-condition: Marked is updated
+	*   @return: nothing
+	*/
+	void setMarked(bool b);
+	
+	/*
+	*   @function: isOppositeType()
+	*   @description: returns true/false based on if the parameter Point
+			contains a stone of different color and is not empty
+	*   @pre-condition: Object exists
+	*   @post-condition: Object unchanged
+	*   @return: bool
+	*/
+	bool isOppositeType(Point p) const;
+	
+	/*
+	*   @function: isOppositeType()
+	*   @description: returns true/false based on if the parameter Point pointer
+			contains a stone of different color and is not empty
+	*   @pre-condition: Object exists
+	*   @post-condition: Object unchanged
+	*   @return: bool
+	*/
+	bool isOppositeType(Point *p) const;
+	
+	/*
+	*   @function: isTerritory()
+	*   @description: 
+	*   @pre-condition: Object exists
+	*   @post-condition: 
+	*   @return: bool
+	*/
+	bool isTerritory() const;
+	
+	/*
+	*   @function: setTerritory()
+	*   @description: 
+	*   @pre-condition: Object exists
+	*   @post-condition: 
+	*   @return: nothing
+	*/
+	void setTerritory(bool b);
+	
+	
 };
 
 #endif

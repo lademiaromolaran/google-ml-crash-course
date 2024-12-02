@@ -106,7 +106,6 @@ void playMatch(SDL_Plotter& g, Settings& s) //WIP
 
     while(!g.getQuit())
     {
-
         //Hover Stone
         g.getMouseLocation(hover.x, hover.y);
         hCoord = pointToCoord(hover, pointLength, offset);
@@ -139,7 +138,25 @@ void playMatch(SDL_Plotter& g, Settings& s) //WIP
                 stoneType = static_cast<StoneType>((stoneType + 1) % 2);
                 setterStone.setType(stoneType);
                 board[mCoord.row][mCoord.col].drawPoint(g, pointLength, offset);
-
+				// Capture Rule
+            	for(int i = 0; i < 4; i++)
+				{
+					// if adjacent stone is opposite type
+					if(board[mCoord.row][mCoord.col].isOppositeType(board[mCoord.row][mCoord.col].getLiberty(static_cast<Direction>(i))))
+					{
+						if(isStringSurrounded(board, *board[mCoord.row][mCoord.col].getLiberty(static_cast<Direction>(i))))
+						{
+							captureStones(board, s.boardSize, g, pointLength, offset, pB, pW);
+						}
+						else
+						{
+							unMarkStones(board, s.boardSize);
+						}
+					}	
+				}
+				
+				
+				
                 //Player updates
                 if(stoneType == pB.getStoneType())
                 {
