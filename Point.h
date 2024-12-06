@@ -3,7 +3,7 @@
 * File Name: Point.h
 * File Description: This file contains the Point class
 * Date Created: 11/12/2024
-* Date Last Modified: 11/30/2024
+* Date Last Modified: 12/4/2024
 */
 
 #ifndef POINT_H
@@ -21,7 +21,6 @@ private:
     int col;
     Stone stone;
     bool marked;
-    bool territory;
 
     //List of the 4 neighboring Points, if border then nullptr
     Point** liberties;
@@ -150,15 +149,7 @@ public:
     *   @return: nothing
     */
     void drawPoint(SDL_Plotter& g, int pointLength, point offset=point(0,0));
-    
-    /*
-	*   @function: erasePoint()
-	*   @description: Plots the background
-	*   @pre-condition: Object exists
-	*   @post-condition: Object unchanged, SDL_Plotter updated
-	*   @return: nothing
-	*/
-	void erasePoint(SDL_Plotter& g, int pointLength, point offset=point(0,0));
+
     
 	/*
 	*   @function: isMarked()
@@ -198,23 +189,6 @@ public:
 	*/
 	bool isOppositeType(Point *p) const;
 	
-	/*
-	*   @function: isTerritory()
-	*   @description: 
-	*   @pre-condition: Object exists
-	*   @post-condition: 
-	*   @return: bool
-	*/
-	bool isTerritory() const;
-	
-	/*
-	*   @function: setTerritory()
-	*   @description: 
-	*   @pre-condition: Object exists
-	*   @post-condition: 
-	*   @return: nothing
-	*/
-	void setTerritory(bool b);
 	
 	
 };

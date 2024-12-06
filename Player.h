@@ -1,9 +1,9 @@
 /*
-* Author: Aidan Stout
+* Author: Aidan Stout, Ryan Limprecht
 * File Name: Player.h
 * File Description: This file contains the Player class
 * Date Created: 11/19/2024
-* Date Last Modified: 11/19/2024
+* Date Last Modified: 12/5/2024
 */
 
 #ifndef PLAYER_H
@@ -12,6 +12,7 @@
 #include <ctime>
 #include "SDL_Plotter.h"
 #include "config.h"
+#include "Point.h"
 
 class Player
 {
@@ -23,6 +24,7 @@ private:
     time_t timerStart;
     unsigned int timerSeconds;
     bool isPaused;
+	Point* bannedCapture;
 
 
 public:
@@ -137,6 +139,13 @@ public:
     *   @return: none
     */
     void addCapturedStones(int stones);
+    
+    
+    // WIP
+    Point* bannedCapturePoint();
+	
+	
+	void setBannedCapturePoint(Point* p);
 };
 
 #endif

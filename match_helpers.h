@@ -4,7 +4,7 @@
 * File Description: This file contains functions that help
                     the playMatch stage specifically in stages.h
 * Date Created: 11/13/2024
-* Date Last Modified: 11/30/2024
+* Date Last Modified: 12/5/2024
 */
 
 #ifndef MATCH_HELPERS_H
@@ -41,8 +41,8 @@ void drawBoard(SDL_Plotter& g, Point** board, int boardSize,
 *   @return: true if p is within bounds of board,
              and Point does not have a stone, else false
 */
-bool isPlaceable(Point** board, point p, int pointLength,
-                 int boardSize, point offset = point(0,0));
+bool isPlaceable(Point** board, int** territory, StoneType stoneType, point p, int pointLength,
+                 int boardSize, Player pB, Player pW, point offset = point(0,0));
 
 /*
 *   @function: pointToCoord()
@@ -90,7 +90,8 @@ bool isStringSurrounded(Point** &board, Point &p);
 *   @post-condition: All capturable stones are removed from the board
 *   @return: none
 */
-void captureStones(Point** &board, int size, SDL_Plotter& g, int pointLength, point offset, Player& pB, Player& pW);
+void captureStones(Point** &board, int size, SDL_Plotter& g, int pointLength, 
+	point offset, Player& pB, Player& pW, int** &territory);
 
 /*
 *   @function: unMarkStones()
@@ -100,5 +101,6 @@ void captureStones(Point** &board, int size, SDL_Plotter& g, int pointLength, po
 *   @return: none
 */
 void unMarkStones(Point** &board, int size);
+
 
 #endif

@@ -2,7 +2,7 @@
 
 Player::Player(StoneType stoneType)
 :stoneType(stoneType), placedStones(0), territoryCount(0),
- capturedStones(0), timerStart(0), timerSeconds(0), isPaused(true){}
+ capturedStones(0), timerStart(0), timerSeconds(0), isPaused(true), bannedCapture(nullptr){}
 
 void Player::startTimer()
 {
@@ -75,4 +75,15 @@ void Player::setTerritoryCount(int territory)
 void Player::addCapturedStones(int stones)
 {
     capturedStones += stones;
+}
+
+
+Point* Player::bannedCapturePoint()
+{
+	return bannedCapture;
+}
+
+void Player::setBannedCapturePoint(Point* p)
+{
+	bannedCapture = p;
 }

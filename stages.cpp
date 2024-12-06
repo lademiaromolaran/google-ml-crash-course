@@ -52,10 +52,13 @@ void playMatch(SDL_Plotter& g, Settings& s) //WIP
     point offset(0,0);
     int pointLength = (SCREEN_X - offset.x*2) / s.boardSize;
     point mouse, hover, center;
-    Coordinate mCoord, hCoord;
+    Coordinate mCoord, hCoord; 
     StoneType stoneType = ST_BLACK;
     Stone setterStone;
     color highlight;
+    int turn = 0;
+    int ** territory = new int*[s.boardSize];
+    
 
     Player pB(ST_BLACK), pW(ST_WHITE);
 
@@ -68,8 +71,10 @@ void playMatch(SDL_Plotter& g, Settings& s) //WIP
     for(int r = 0; r < s.boardSize; r++)
     {
         board[r] = new Point[s.boardSize];
+        territory[r] = new int[s.boardSize];
     }
-
+    
+	
     //Map to neighbors
     for(int r = 0; r < s.boardSize; r++)
     {
@@ -77,6 +82,9 @@ void playMatch(SDL_Plotter& g, Settings& s) //WIP
         {
             board[r][c].setRow(r);
             board[r][c].setCol(c);
+            
+            
+            territory[r][c] = 2;
 
             if(r > 0)
             {
@@ -94,6 +102,7 @@ void playMatch(SDL_Plotter& g, Settings& s) //WIP
             {
                 board[r][c].setLiberty(board[r] + c+1, RIGHT);
             }
+            
         }
     }
 
@@ -112,7 +121,7 @@ void playMatch(SDL_Plotter& g, Settings& s) //WIP
 
         if(coordInBounds(hCoord, s.boardSize))
         {
-            if(isPlaceable(board, hover, pointLength, s.boardSize, offset))
+            if(isPlaceable(board, territory, stoneType, hover, pointLength, s.boardSize, pB, pW, offset))
             {
                 highlight = s.validHighlight;
             }
@@ -131,22 +140,34 @@ void playMatch(SDL_Plotter& g, Settings& s) //WIP
         if(g.mouseClick())
         {
             mouse = g.getMouseClick();
-            if(isPlaceable(board, mouse, pointLength, s.boardSize, offset))
+            if(isPlaceable(board, territory, stoneType, mouse, pointLength, s.boardSize, pB, pW, offset))
             {
                 mCoord = pointToCoord(mouse, pointLength, offset);
                 board[mCoord.row][mCoord.col].setStone(setterStone);
-                stoneType = static_cast<StoneType>((stoneType + 1) % 2);
-                setterStone.setType(stoneType);
                 board[mCoord.row][mCoord.col].drawPoint(g, pointLength, offset);
 				// Capture Rule
             	for(int i = 0; i < 4; i++)
 				{
 					// if adjacent stone is opposite type
-					if(board[mCoord.row][mCoord.col].isOppositeType(board[mCoord.row][mCoord.col].getLiberty(static_cast<Direction>(i))))
+					if(board[mCoord.row][mCoord.col].getLiberty(static_cast<Direction>(i)) != nullptr 
+						&& board[mCoord.row][mCoord.col].isOppositeType(board[mCoord.row][mCoord.col].getLiberty(static_cast<Direction>(i))))
 					{
 						if(isStringSurrounded(board, *board[mCoord.row][mCoord.col].getLiberty(static_cast<Direction>(i))))
 						{
-							captureStones(board, s.boardSize, g, pointLength, offset, pB, pW);
+							captureStones(board, s.boardSize, g, pointLength, offset, pB, pW, territory);
+							
+							// Check for Ko Rule
+							if(isStringSurrounded(board, *board[mCoord.row][mCoord.col].getLiberty(static_cast<Direction>(i))))
+							{
+								if(stoneType == ST_BLACK)
+								{
+									pW.setBannedCapturePoint(board[mCoord.row][mCoord.col].getLiberty(static_cast<Direction>(i)));
+								}
+								else
+								{
+									pB.setBannedCapturePoint(board[mCoord.row][mCoord.col].getLiberty(static_cast<Direction>(i)));
+								}
+							}
 						}
 						else
 						{
@@ -172,16 +193,31 @@ void playMatch(SDL_Plotter& g, Settings& s) //WIP
 
                     pB.addStones(1);
                 }
-            }
-
+                if(stoneType == ST_BLACK)
+                {
+                	pB.setBannedCapturePoint(nullptr);
+				}
+				else
+				{
+					pW.setBannedCapturePoint(nullptr);
+				}
+                
+            	stoneType = static_cast<StoneType>((stoneType + 1) % 2);
+                setterStone.setType(stoneType);
+                
+                turn++;
+            }	
         }
         g.update();
+        
+        
 
         //Clear Hover
         if(coordInBounds(hCoord, s.boardSize))
         {
             board[hCoord.row][hCoord.col].drawPoint(g, pointLength, offset);
         }
+        
     }
 
     for(int r = 0; r < s.boardSize; r++)
