@@ -1,42 +1,39 @@
 #include "match_helpers.h"
 
-void drawBoard(SDL_Plotter& g, Point** board, int boardSize,
-               int pointLength, point offset)
+void drawBoard(SDL_Plotter& g, Board& b)
 {
-    for(int r = 0; r < boardSize; r++)
+    for(int r = 0; r < *b.boardSize; r++)
     {
-        for(int c = 0; c < boardSize; c++)
+        for(int c = 0; c < *b.boardSize; c++)
         {
-            board[r][c].drawPoint(g, pointLength, offset);
+            b.board[r][c].drawPoint(g, *b.pointLength, *b.offset);
         }
     }
 }
 
-bool isPlaceable(Point** board, int** territory, StoneType stoneType, point p, int pointLength,
-                 int boardSize, Player pB, Player pW, point offset)
+bool isPlaceable(Board& b, StoneType stoneType, point p)
 {
-    Coordinate c = pointToCoord(p, pointLength, offset);
+    Coordinate c = pointToCoord(p, *b.pointLength, *b.offset);
     bool result = false;
 
-    if(coordInBounds(c, boardSize) 
-		&& board[c.row][c.col].getStoneType() == ST_EMPTY)
+    if(coordInBounds(c, *b.boardSize)
+		&& b.board[c.row][c.col].getStoneType() == ST_EMPTY
+        && !isSelfCapture(b, b.board[c.row][c.col]))
     {
-    	if(stoneType == ST_BLACK)
+    	if(stoneType == ST_BLACK
+           && &b.board[c.row][c.col] != b.pB->getBannedCapturePoint())
     	{
-    		if(territory[c.row][c.col] != 1 && &board[c.row][c.col] != pB.bannedCapturePoint())
-    		{
-    			result = true;
-    		}
+    		result = true;
 		}
-		if(stoneType == ST_WHITE)
+
+		if(stoneType == ST_WHITE
+           && &b.board[c.row][c.col] != b.pW->getBannedCapturePoint())
 		{
-			if(territory[c.row][c.col] != 0 && &board[c.row][c.col] != pW.bannedCapturePoint())
-			{
-				result = true;	
-			}
+		    result = true;
 		}
     }
 
+    unmarkStones(b.board, *b.boardSize);
 
     return result;
 }
@@ -62,7 +59,8 @@ bool coordInBounds(Coordinate c, int boardSize)
     return result;
 }
 
-void drawHover(SDL_Plotter& g, point center, int pointLength, color stone, color highlight)
+void drawHover(SDL_Plotter& g, point center, int pointLength,
+               color stone, color highlight)
 {
     int radius = pointLength / 2.2;
     double thickness = 1.5;
@@ -73,56 +71,32 @@ void drawHover(SDL_Plotter& g, point center, int pointLength, color stone, color
 
 
 bool isStringSurrounded(Point** &board, Point &p)
-{	
-	// Base Case 1: Empty Space Adjacent	
-	bool check = true;
-	int i = 0;
-	for(i; i < 4; i++)
-	{ 
-		if(p.getLiberty(static_cast<Direction>(i)) != nullptr 
-			&& p.getLiberty(static_cast<Direction>(i))->getStone().isEmpty())
-		{
-			return false;
-		}
-	}
-	
+{
+	// Base Case 1: Empty Space Adjacent
+	if(!p.isSurrounded())
+    {
+        return false;
+    }
+
 	p.setMarked(true);
-	
-	// Base Case 2: Stone is surrounded by opposite color or marked		
-	i = 0;
-	check = true;
-	while(check && i < 4)
-	{
-		// if stone at Direction i is the same type and unmarked
-		if(p.getLiberty(static_cast<Direction>(i)) != nullptr 
-			&& !p.isOppositeType(p.getLiberty(static_cast<Direction>(i))) 
-			&& !p.getLiberty(static_cast<Direction>(i))->isMarked())
-		{
-			check = false;
-		}
-		i++;
-	}
-	// if check remains true
-	if(check)
-	{
-		return true;
-	}
-	
+
 	// Recursive Calls
-	i = 0;
-	check = true;
-	while(check && i < 4)
+    Direction direction;
+	bool check = true;
+	for(int i = 0; check && i < 4; i++)
 	{
+	    direction = static_cast<Direction>(i);
+
 		// if stone at Direction i is the same type and unmarked
-		if(p.getLiberty(static_cast<Direction>(i)) != nullptr 
-			&& !p.isOppositeType(p.getLiberty(static_cast<Direction>(i))) 
-			&& !p.getLiberty(static_cast<Direction>(i))->isMarked())
+		if(p.getLiberty(direction) != nullptr
+			&& !p.isOppositeType(p.getLiberty(direction))
+			&& !p.getLiberty(direction)->isMarked())
 		{
 			// recursive call
-			check = isStringSurrounded(board, *p.getLiberty(static_cast<Direction>(i)));
+			check = isStringSurrounded(board, *p.getLiberty(direction));
 		}
-		i++;
 	}
+
 	if(check)
 	{
 		return true;
@@ -132,61 +106,33 @@ bool isStringSurrounded(Point** &board, Point &p)
 }
 
 
-void captureStones(Point** &board, int size, SDL_Plotter& g, int pointLength, 
-	point offset, Player& pB, Player& pW, int** &territory)
+void captureStones(SDL_Plotter& g, Board& b)
 {
-	
-	for(int r = 0; r < size; r++)
+
+	for(int r = 0; r < *b.boardSize; r++)
 	{
-		for(int c = 0; c < size; c++)
+		for(int c = 0; c < *b.boardSize; c++)
 		{
-			if(board[r][c].isMarked())
+			if(b.board[r][c].isMarked())
 			{
-				if(board[r][c].getStoneType() == pB.getStoneType())
+				if(b.board[r][c].getStoneType() == b.pB->getStoneType())
 				{
-					pB.removeStones(1);
+					b.pB->removeStones(1);
 				}
 				else
 				{
-					pW.removeStones(1);
+					b.pW->removeStones(1);
 				}
-				
-				/* -Territory Check Interferes w/ Ko Rule currently-
-				bool check = true;
-				int i = 0;
-				while(check && i < 4)
-				{
-					if(board[r][c].getLiberty(static_cast<Direction>(i)) != nullptr 
-						&& !board[r][c].isOppositeType(board[r][c].getLiberty(static_cast<Direction>(i))))
-					{
-						check = false;
-					}
-					i++;
-				}
-				if(check)
-				{
-					if(board[r][c].getStoneType() == ST_BLACK)
-					{
-						territory[r][c] = 1;
-					}
-					else
-					{
-						territory[r][c] = 0;
-					}
-				}
-				*/
-				
-				
-				board[r][c].setMarked(false);
-				board[r][c].setStone(Stone(ST_EMPTY));
-				board[r][c].drawPoint(g, pointLength, offset);
+
+				b.board[r][c].setMarked(false);
+				b.board[r][c].removeStone();
+				b.board[r][c].drawPoint(g, *b.pointLength, *b.offset);
 			}
 		}
 	}
 }
 
-
-void unMarkStones(Point** &board, int size)
+void unmarkStones(Point** &board, int size)
 {
 	for(int r = 0; r < size; r++)
 	{
@@ -199,3 +145,85 @@ void unMarkStones(Point** &board, int size)
 		}
 	}
 }
+
+void koRule(Board& b, Point* p)
+{
+    if(p->isSurrounded())
+    {
+        switch(p->surroundedType())
+        {
+            case ST_BLACK:
+                b.pW->setBannedCapturePoint(p);
+                break;
+            case ST_WHITE:
+                b.pB->setBannedCapturePoint(p);
+                break;
+            default: break;
+        }
+    }
+}
+
+void captureRule(SDL_Plotter& g, Board& b, Point& p)
+{
+    Direction direction;
+
+    for(int i = 0; i < 4; i++)
+    {
+        direction = static_cast<Direction>(i);
+
+        // if adjacent stone is opposite type
+        if(p.getLiberty(direction) != nullptr
+            && p.isOppositeType(p.getLiberty(direction)))
+        {
+            if(isStringSurrounded(b.board, *p.getLiberty(direction)))
+            {
+                captureStones(g, b);
+
+                koRule(b, p.getLiberty(direction));
+            }
+            else
+            {
+                unmarkStones(b.board, *b.boardSize);
+            }
+        }
+    }
+}
+
+bool isSelfCapture(Board& b, Point& p)
+{
+    bool result = true;
+    Direction direction;
+    Stone tmp = p.getStone();
+    p.setStone(*b.setterStone);
+
+    //Check if any liberties are surrounded by stones of player's type
+    for(int i = 0; result && i < 4; i++)
+    {
+        direction = static_cast<Direction>(i);
+
+        if(p.getLiberty(direction) != nullptr
+            && p.isOppositeType(p.getLiberty(direction)))
+        {
+            if(isStringSurrounded(b.board, *p.getLiberty(direction)))
+            {
+                result = false;
+            }
+            unmarkStones(b.board, *b.boardSize);
+        }
+    }
+
+    // Check if the player would be completely surrounded by opponent stones
+    if(result)
+    {
+       if(!isStringSurrounded(b.board, p))
+       {
+           result = false;
+       }
+       unmarkStones(b.board, *b.boardSize);
+    }
+
+    p.setStone(tmp);
+
+    return result;
+}
+

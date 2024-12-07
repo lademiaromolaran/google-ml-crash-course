@@ -3,7 +3,7 @@
 * File Name: Player.h
 * File Description: This file contains the Player class
 * Date Created: 11/19/2024
-* Date Last Modified: 12/5/2024
+* Date Last Modified: 12/7/2024
 */
 
 #ifndef PLAYER_H
@@ -139,12 +139,24 @@ public:
     *   @return: none
     */
     void addCapturedStones(int stones);
-    
-    
-    // WIP
-    Point* bannedCapturePoint();
-	
-	
+
+
+    /*
+    *   @function: getBannedCapturePoint()
+    *   @description: returns pointer to banned capture Point
+    *   @pre-condition: Object exists
+    *   @post-condition: Object unchanged
+    *   @return: pointer to banned capture Point
+    */
+    Point* getBannedCapturePoint() const;
+
+    /*
+    *   @function: setBannedCapturePoint()
+    *   @description: Prevents placement of a stone at Point
+    *   @pre-condition: Object exists
+    *   @post-condition: bannedCapture updated
+    *   @return: nothing
+    */
 	void setBannedCapturePoint(Point* p);
 };
 

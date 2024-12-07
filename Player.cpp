@@ -78,7 +78,7 @@ void Player::addCapturedStones(int stones)
 }
 
 
-Point* Player::bannedCapturePoint()
+Point* Player::getBannedCapturePoint() const
 {
 	return bannedCapture;
 }

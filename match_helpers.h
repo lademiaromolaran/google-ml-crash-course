@@ -4,7 +4,7 @@
 * File Description: This file contains functions that help
                     the playMatch stage specifically in stages.h
 * Date Created: 11/13/2024
-* Date Last Modified: 12/5/2024
+* Date Last Modified: 12/7/2024
 */
 
 #ifndef MATCH_HELPERS_H
@@ -22,6 +22,21 @@ struct Coordinate
     Coordinate(int row=0, int col=0): row(row), col(col){}
 };
 
+struct Board
+{
+    Point** board;
+    point* offset;
+    int* pointLength;
+    Stone* setterStone;
+    Player* pB;
+    Player* pW;
+    int* boardSize;
+
+    Board(): board(nullptr), offset(nullptr), pointLength(nullptr),
+             setterStone(nullptr), pB(nullptr), pW(nullptr),
+             boardSize(nullptr){}
+};
+
 /*
 *   @function: drawBoard()
 *   @description: Plots the entire Go board
@@ -29,8 +44,7 @@ struct Coordinate
 *   @post-condition: Plotter updated with board
 *   @return: nothing
 */
-void drawBoard(SDL_Plotter& g, Point** board, int boardSize,
-               int pointLength, point offset = point(0,0));
+void drawBoard(SDL_Plotter& g, Board& b);
 
 
 /*
@@ -39,10 +53,12 @@ void drawBoard(SDL_Plotter& g, Point** board, int boardSize,
 *   @pre-condition: None
 *   @post-condition: true if placable, else false
 *   @return: true if p is within bounds of board,
-             and Point does not have a stone, else false
+             Point does not have a stone,
+             Point does not violate Ko rule,
+             and Point would not result in a self capture,
+             else false
 */
-bool isPlaceable(Point** board, int** territory, StoneType stoneType, point p, int pointLength,
-                 int boardSize, Player pB, Player pW, point offset = point(0,0));
+bool isPlaceable(Board& b, StoneType stoneType, point p);
 
 /*
 *   @function: pointToCoord()
@@ -72,11 +88,13 @@ bool coordInBounds(Coordinate c, int boardSize);
 *   @post-condition: Hover Stone and highlight plotted
 *   @return: nothing
 */
-void drawHover(SDL_Plotter& g, point center, int pointLength, color stone, color highlight);
+void drawHover(SDL_Plotter& g, point center, int pointLength,
+               color stone, color highlight);
 
 /*
 *   @function: isStringSurrounded()
-*   @description: Revursively checks whether a string of same type stones is capturable
+*   @description: Recursively checks whether a string of
+                  same type stones is capturable
 *   @pre-condition: none
 *   @post-condition: true if string can be captured, false if not
 *   @return: bool
@@ -90,17 +108,49 @@ bool isStringSurrounded(Point** &board, Point &p);
 *   @post-condition: All capturable stones are removed from the board
 *   @return: none
 */
-void captureStones(Point** &board, int size, SDL_Plotter& g, int pointLength, 
-	point offset, Player& pB, Player& pW, int** &territory);
+void captureStones(SDL_Plotter& g, Board& b);
 
 /*
-*   @function: unMarkStones()
+*   @function: unmarkStones()
 *   @description: Unmarks all marked stones
 *   @pre-condition: none
 *   @post-condition: All marks will be cleared
 *   @return: none
 */
-void unMarkStones(Point** &board, int size);
+void unmarkStones(Point** &board, int size);
+
+/*
+*   @function: koRule()
+*   @description: Adds the Point to the bannedCapturePoint of the
+                  player who last played it
+*   @pre-condition: none
+*   @post-condition: bannedCapturePoint updated for player
+                     who previously played Point
+*   @return: nothing
+*/
+void koRule(Board& b, Point* p);
+
+/*
+*   @function: captureRule()
+*   @description: Runs the capture rule for the new Point.
+*   @pre-condition: none
+*   @post-condition: Captured stones removed,
+                     Ko rule enacted for single captured stone,
+                     Player score updated based on removed stones
+*   @return: nothing
+*/
+void captureRule(SDL_Plotter& g, Board& b, Point& p);
+
+/*
+*   @function: isSelfCapture()
+*   @description: Checks if the Point's placement would result in a
+                  self capture same turn
+*   @pre-condition: none
+*   @post-condition: none
+*   @return: True if the Point won't capture anything and
+             immediately be capturable, else False
+*/
+bool isSelfCapture(Board& b, Point& p);
 
 
 #endif
