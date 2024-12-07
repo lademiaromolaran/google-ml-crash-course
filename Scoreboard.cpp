@@ -11,7 +11,7 @@
 #include "Scoreboard.h"
 #include "Player.h"
 
-Scoreboard::Scoreboard(SDL_Plotter& g, Player black, Player white, Point pos, int w, int h)
+Scoreboard::Scoreboard(SDL_Plotter& g, Player black, Player white, point pos, int w, int h)
     : plotter(&g), blackPlayer(black), whitePlayer(white), position(pos), width(w), height(h) {}
 
 
