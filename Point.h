@@ -3,7 +3,7 @@
 * File Name: Point.h
 * File Description: This file contains the Point class
 * Date Created: 11/12/2024
-* Date Last Modified: 12/4/2024
+* Date Last Modified: 12/7/2024
 */
 
 #ifndef POINT_H
@@ -130,7 +130,7 @@ public:
     *   @return: copy of stone type
     */
     StoneType getStoneType() const;
-    
+
     /*
 	*   @function: getLiberty()
 	*   @description: returns a pointer to an adjacent point
@@ -150,7 +150,7 @@ public:
     */
     void drawPoint(SDL_Plotter& g, int pointLength, point offset=point(0,0));
 
-    
+
 	/*
 	*   @function: isMarked()
 	*   @description: returns marked as a bool
@@ -159,7 +159,7 @@ public:
 	*   @return: bool
 	*/
 	bool isMarked() const;
-	
+
 	/*
 	*   @function: setMarked()
 	*   @description: updates Marked bool
@@ -168,7 +168,7 @@ public:
 	*   @return: nothing
 	*/
 	void setMarked(bool b);
-	
+
 	/*
 	*   @function: isOppositeType()
 	*   @description: returns true/false based on if the parameter Point
@@ -178,7 +178,7 @@ public:
 	*   @return: bool
 	*/
 	bool isOppositeType(Point p) const;
-	
+
 	/*
 	*   @function: isOppositeType()
 	*   @description: returns true/false based on if the parameter Point pointer
@@ -188,9 +188,52 @@ public:
 	*   @return: bool
 	*/
 	bool isOppositeType(Point *p) const;
-	
-	
-	
+
+	/*
+	*   @function: isOppositeType()
+	*   @description: returns true/false based on if the parameter stoneType
+			is a different color and is not empty
+	*   @pre-condition: Object exists
+	*   @post-condition: Object unchanged
+	*   @return: bool
+	*/
+	bool isOppositeType(StoneType type) const;
+
+	/*
+	*   @function: removeStone()
+	*   @description: sets the StoneType to ST_EMPTY
+	*   @pre-condition: Object exists
+	*   @post-condition: stone updates
+	*   @return: nothing
+	*/
+	void removeStone();
+
+	/*
+	*   @function: isSurrounded()
+	*   @description: returns True if all the liberties have stones
+                      or are borders, else false
+	*   @pre-condition: Object exists
+	*   @post-condition: Object unchanged
+	*   @return: True if all liberties are ST_BLACK, ST_WHITE, or borders,
+                 else false
+	*/
+	bool isSurrounded() const;
+
+	/*
+	*   @function: surroundedType()
+	*   @description: returns the StoneType of the surrounding points, if both
+                      ST_BLACK and ST_WHITE surround then return ST_EMPTY
+	*   @pre-condition: Object exists, isSurrounded() returns true
+	*   @post-condition: Object unchanged
+	*   @throw: GoGameException if isSurrounded is false
+	*   @return: ST_BLACK if all liberties are only ST_BLACK or borders,
+                 ST_WHITE if all liberties are only ST_WHITE or borders,
+                 ST_EMPTY if all liberties are ST_BLACK, ST_WHITE, or borders
+	*/
+	StoneType surroundedType() const;
+
+
+
 };
 
 #endif
