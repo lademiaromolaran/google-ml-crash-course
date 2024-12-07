@@ -59,16 +59,28 @@ void playMatch(SDL_Plotter& g, Settings& s) //WIP
 
     Player pB(ST_BLACK), pW(ST_WHITE);
 
+    Board b;
+
     //Link setterStone to settings' colors
     setterStone.setPlayerBlackColor(&s.blackStone);
     setterStone.setPlayerWhiteColor(&s.whiteStone);
     setterStone.setType(stoneType);
+
+    //Link values to Board object
+    b.board = board;
+    b.offset = &offset;
+    b.pointLength = &pointLength;
+    b.setterStone = &setterStone;
+    b.pB = &pB;
+    b.pW = &pW;
+    b.boardSize = &s.boardSize;
 
     //Initialize Board
     for(int r = 0; r < s.boardSize; r++)
     {
         board[r] = new Point[s.boardSize];
     }
+
 
     //Map to neighbors
     for(int r = 0; r < s.boardSize; r++)
@@ -77,6 +89,7 @@ void playMatch(SDL_Plotter& g, Settings& s) //WIP
         {
             board[r][c].setRow(r);
             board[r][c].setCol(c);
+
 
             if(r > 0)
             {
@@ -94,11 +107,12 @@ void playMatch(SDL_Plotter& g, Settings& s) //WIP
             {
                 board[r][c].setLiberty(board[r] + c+1, RIGHT);
             }
+
         }
     }
 
     //Render Board
-    drawBoard(g, board, s.boardSize, pointLength, offset);
+    drawBoard(g, b);
 
 
     //Start Timer
@@ -106,14 +120,13 @@ void playMatch(SDL_Plotter& g, Settings& s) //WIP
 
     while(!g.getQuit())
     {
-
         //Hover Stone
         g.getMouseLocation(hover.x, hover.y);
         hCoord = pointToCoord(hover, pointLength, offset);
 
         if(coordInBounds(hCoord, s.boardSize))
         {
-            if(isPlaceable(board, hover, pointLength, s.boardSize, offset))
+            if(isPlaceable(b, stoneType, hover))
             {
                 highlight = s.validHighlight;
             }
@@ -132,13 +145,13 @@ void playMatch(SDL_Plotter& g, Settings& s) //WIP
         if(g.mouseClick())
         {
             mouse = g.getMouseClick();
-            if(isPlaceable(board, mouse, pointLength, s.boardSize, offset))
+            if(isPlaceable(b, stoneType, mouse))
             {
                 mCoord = pointToCoord(mouse, pointLength, offset);
                 board[mCoord.row][mCoord.col].setStone(setterStone);
-                stoneType = static_cast<StoneType>((stoneType + 1) % 2);
-                setterStone.setType(stoneType);
                 board[mCoord.row][mCoord.col].drawPoint(g, pointLength, offset);
+
+            	captureRule(g, b, board[mCoord.row][mCoord.col]);
 
                 //Player updates
                 if(stoneType == pB.getStoneType())
@@ -146,25 +159,35 @@ void playMatch(SDL_Plotter& g, Settings& s) //WIP
                     pB.startTimer();
                     pW.pauseTimer();
 
-                    pW.addStones(1);
+                    pB.addStones(1);
+
+                    pB.setBannedCapturePoint(nullptr);
                 }
                 else
                 {
                     pW.startTimer();
                     pB.pauseTimer();
 
-                    pB.addStones(1);
-                }
-            }
+                    pW.addStones(1);
 
+                    pW.setBannedCapturePoint(nullptr);
+                }
+
+                //Switch to next player
+            	stoneType = static_cast<StoneType>((stoneType + 1) % 2);
+                setterStone.setType(stoneType);
+            }
         }
         g.update();
+
+
 
         //Clear Hover
         if(coordInBounds(hCoord, s.boardSize))
         {
             board[hCoord.row][hCoord.col].drawPoint(g, pointLength, offset);
         }
+
     }
 
     for(int r = 0; r < s.boardSize; r++)
