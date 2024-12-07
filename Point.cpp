@@ -1,6 +1,9 @@
 #include "Point.h"
+#include <iostream>
+using namespace std;
 
-Point::Point(int row, int col, Stone stone): row(row), col(col), stone(stone), liberties(new Point*[4])
+Point::Point(int row, int col, Stone stone): row(row), col(col), stone(stone),
+	liberties(new Point*[4]), marked(false)
 {
     for(int i = 0; i < 4; i++)
     {
@@ -60,6 +63,12 @@ StoneType Point::getStoneType() const
 }
 
 
+Point* Point::getLiberty(Direction d) const
+{
+	return liberties[d];
+}
+
+
 void Point::drawPoint(SDL_Plotter& g, int pointLength, point offset)
 {
     point center(offset.x + col*pointLength + pointLength/2,
@@ -103,11 +112,90 @@ void Point::drawPoint(SDL_Plotter& g, int pointLength, point offset)
 }
 
 
+bool Point::isMarked() const
+{
+	return marked;
+}
+
+
+void Point::setMarked(bool b)
+{
+	this->marked = b;
+}
+
+
+bool Point::isOppositeType(Point p) const
+{
+	return this->getStoneType() != p.getStoneType()
+	       && !p.getStone().isEmpty();
+}
+
+bool Point::isOppositeType(Point* p) const
+{
+	return this->getStoneType() != p->getStoneType()
+	       && !p->getStone().isEmpty();
+}
+
+bool Point::isOppositeType(StoneType type) const
+{
+	return this->getStoneType() != type && type != ST_EMPTY;
+}
+
+void Point::removeStone()
+{
+    stone.setType(ST_EMPTY);
+}
+
+bool Point::isSurrounded() const
+{
+    bool result = true;
+    for(int i = 0; i < 4; i++)
+    {
+        if(liberties[i] != nullptr && liberties[i]->getStoneType() == ST_EMPTY)
+        {
+            result = false;
+        }
+    }
+
+    return result;
+}
+
+StoneType Point::surroundedType() const
+{
+    StoneType sType = ST_EMPTY;
+    bool mix = false;
+
+    if(!isSurrounded())
+    {
+        throw GoGameException("Point::surroundedType | Is not surrounded");
+    }
+
+    for(int i = 0; !mix && i < 4; i++)
+    {
+        if(liberties[i] != nullptr)
+        {
+            if(sType == ST_EMPTY)
+            {
+                sType = liberties[i]->getStoneType();
+            }
+            else if(sType != liberties[i]->getStoneType())
+            {
+                sType = ST_EMPTY;
+                mix = true;
+            }
+        }
+    }
+
+    return sType;
+}
+
+
 
 //___________________________Private______________________________
 
 void Point::drawStone(SDL_Plotter& g, point center, int radius)
 {
+
     if(getStoneType() != ST_EMPTY)
     {
         drawCircle(g, center, radius, stone.getColor());

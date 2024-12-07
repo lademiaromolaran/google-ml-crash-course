@@ -1,9 +1,9 @@
 /*
-* Author: Aidan Stout
+* Author: Aidan Stout, Ryan Limprecht
 * File Name: Player.h
 * File Description: This file contains the Player class
 * Date Created: 11/19/2024
-* Date Last Modified: 11/19/2024
+* Date Last Modified: 12/7/2024
 */
 
 #ifndef PLAYER_H
@@ -12,6 +12,7 @@
 #include <ctime>
 #include "SDL_Plotter.h"
 #include "config.h"
+#include "Point.h"
 
 class Player
 {
@@ -23,6 +24,7 @@ private:
     time_t timerStart;
     unsigned int timerSeconds;
     bool isPaused;
+	Point* bannedCapture;
 
 
 public:
@@ -137,6 +139,25 @@ public:
     *   @return: none
     */
     void addCapturedStones(int stones);
+
+
+    /*
+    *   @function: getBannedCapturePoint()
+    *   @description: returns pointer to banned capture Point
+    *   @pre-condition: Object exists
+    *   @post-condition: Object unchanged
+    *   @return: pointer to banned capture Point
+    */
+    Point* getBannedCapturePoint() const;
+
+    /*
+    *   @function: setBannedCapturePoint()
+    *   @description: Prevents placement of a stone at Point
+    *   @pre-condition: Object exists
+    *   @post-condition: bannedCapture updated
+    *   @return: nothing
+    */
+	void setBannedCapturePoint(Point* p);
 };
 
 #endif
