@@ -12,43 +12,53 @@
 * Date Last Modified: 11/19/2024
 */
 
+
 #include <iostream>
+#include <string>
 #include "SDL_Plotter.h"
 #include "config.h"
 #include "stages.h"
 #include "helpers.h"
+#include "Scoreboard.h"
 
 using namespace std;
 
-int main(int argc, char ** argv)
-{
+int main() {
     SDL_Plotter g(SCREEN_X, SCREEN_Y);
     Stage stage;
     Settings settings;
 
-    try
-    {
-        do
-        {
+    point scoreboardPosition = { SCREEN_X - 250, 10 };
+    int scoreboardWidth = 250;
+    int scoreboardHeight = 100;
+
+    Player blackPlayer(ST_BLACK);
+    Player whitePlayer(ST_WHITE);
+
+    blackPlayer.setName("Black Player");
+    whitePlayer.setName("White Player");
+
+    Scoreboard scoreboard(g, blackPlayer, whitePlayer, scoreboardPosition, scoreboardWidth, scoreboardHeight);
+
+    try {
+        do {
             stage = mainMenu(g);
 
-            if(stage == S_OPTIONS)
-            {
+            if (stage == S_OPTIONS) {
                 options(g, settings);
             }
 
-            if(stage == S_PLAY)
-            {
+            if (stage == S_PLAY) {
                 playMatch(g, settings);
+                scoreboard.render(scoreboardPosition.x, scoreboardPosition.y);
             }
-        } while(stage != S_QUIT);
+
+        } while (stage != S_QUIT);
     }
-    catch(GoGameException& e)
-    {
+    catch (GoGameException& e) {
         cout << "Error: " << e.what() << endl;
     }
-    catch(...)
-    {
+    catch (...) {
         cout << "Error!!!" << endl;
     }
 

@@ -2,20 +2,22 @@
 //  Scoreboard.h
 //  CSI 1440 Group Project
 //
-//  Created by Oluwalademi Aromolaran on 12/6/24.
+//  Created by Oluwalademi Aromolaran on 12/7/24.
 //
 
 #ifndef Scoreboard_h
 #define Scoreboard_h
 
+
 #include "SDL_Plotter.h"
 #include "Player.h"
+#include "Point.h"
 
 using namespace std;
 
 class Scoreboard {
 private:
-    Player blackPlayer;   
+    Player blackPlayer;
     Player whitePlayer;
     SDL_Plotter* plotter;
     point position;
@@ -42,7 +44,7 @@ public:
     *   @post-condition: Scoreboard is rendered on the screen
     *   @return: Nothing
     */
-    void render() const;
+    void render(int xOffset, int yOffset) const;
 
     /*
     *   @function: update()
@@ -72,6 +74,36 @@ public:
     *   @return: Nothing
     */
     void renderText(int x, int y, const string& text, color c) const;
+    
+    /*
+     *   @function: setName()
+     *   @description: Sets the name of the player (Black or White).
+     *   @pre-condition: Object exists, isBlack indicates which player’s name is to be set.
+     *   @post-condition: Corresponding player’s name is updated.
+     *   @return: nothing
+     */
+    void setName(bool isBlack, const string& playerName);
+    
+    /*
+     *   @function: getName()
+     *   @description: Gets the name of the player (Black or White).
+     *   @pre-condition: Object exists, isBlack indicates which player’s name to return.
+     *   @post-condition: none
+     *   @return: the name of the player.
+     */
+    string getName(bool isBlack) const;
+    
+    /*
+     *   @function: getTimer()
+     *   @description: Gets the time in seconds that the player (Black or White) has played.
+     *   @pre-condition: Object exists, isBlack indicates which player's timer is being requested.
+     *   @post-condition: none
+     *   @param: isBlack - boolean to decide which player’s timer to get (true for black player, false for white player).
+     *   @return: the timer value in seconds.
+     */
+    size_t getTimer(bool isBlack) const;
+
 };
+
 
 #endif /* Scoreboard_h */
